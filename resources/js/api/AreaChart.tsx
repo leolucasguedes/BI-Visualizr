@@ -16,8 +16,15 @@ interface Props {
 }
 
 export const AreaChart: React.FC<Props> = ({ users }) => {
-    const bairrosUnicos = [...new Set(users.map((user) => user.bairro))];
-    const bairrosValidos = bairrosUnicos.filter(bairro => typeof bairro === 'string' && bairro.trim() !== '');
+    const capitalizeFirstLetter = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+    const bairrosUnicos = [
+        ...new Set(users.map((user) => user.bairro?.toLowerCase().trim().slice(0, 25))),
+    ];
+    const bairrosValidos = bairrosUnicos
+        .filter((bairro) => typeof bairro === "string" && bairro !== "")
+        .map((bairro) => capitalizeFirstLetter(bairro));
 
     const contagemPorBairro: { [key: string]: number } = {};
     users.forEach((user) => {
@@ -38,6 +45,16 @@ export const AreaChart: React.FC<Props> = ({ users }) => {
                     "rgba(75, 192, 192, 0.5)",
                     "rgba(153, 102, 255, 0.5)",
                     "rgba(255, 159, 64, 0.5)",
+                    "rgba(255, 51, 153, 0.5)",
+                    "rgba(0, 204, 102, 0.5)",
+                    "rgba(255, 204, 0, 0.5)",
+                    "rgba(0, 153, 204, 0.5)",
+                    "rgba(153, 0, 204, 0.5)",
+                    "rgba(255, 102, 0, 0.5)",
+                    "rgba(0, 204, 204, 0.5)",
+                    "rgba(204, 0, 102, 0.5)",
+                    "rgba(102, 0, 204, 0.5)",
+                    "rgba(204, 204, 0, 0.5)",
                     "rgba(255, 0, 0, 0.5)",
                     "rgba(0, 255, 0, 0.5)",
                     "rgba(0, 0, 255, 0.5)",
@@ -65,6 +82,16 @@ export const AreaChart: React.FC<Props> = ({ users }) => {
                     "rgba(75, 192, 192, 1)",
                     "rgba(153, 102, 255, 1)",
                     "rgba(255, 159, 64, 1)",
+                    "rgba(255, 51, 153, 0.5)",
+                    "rgba(0, 204, 102, 0.5)",
+                    "rgba(255, 204, 0, 0.5)",
+                    "rgba(0, 153, 204, 0.5)",
+                    "rgba(153, 0, 204, 0.5)",
+                    "rgba(255, 102, 0, 0.5)",
+                    "rgba(0, 204, 204, 0.5)",
+                    "rgba(204, 0, 102, 0.5)",
+                    "rgba(102, 0, 204, 0.5)",
+                    "rgba(204, 204, 0, 0.5)",
                     "rgba(255, 0, 0, 1)",
                     "rgba(0, 255, 0, 1)",
                     "rgba(0, 0, 255, 1)",
@@ -128,7 +155,7 @@ export const AreaLegend: React.FC<LegendProps> = ({
                 {labels.map((label, index) => (
                     <Link href={`/bairro/${label}`}>
                         <li
-                            key={label}
+                            key={`${label}${index}`}
                             className="flex items-center ml-4 mr-1 mb-2 text-10px"
                         >
                             <span

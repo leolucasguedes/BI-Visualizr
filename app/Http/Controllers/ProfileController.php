@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,13 +30,20 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validatedData = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (isset($validatedData['email']) && $validatedData['email'] !== $request->user()->email) {
+            $validatedData['email_verified_at'] = null;
         }
 
-        $request->user()->save();
+        if (isset($validatedData['nascimento'])) {
+            $nascimento = Carbon::createFromFormat('dmY', $validatedData['nascimento']);
+            $validatedData['nascimento'] = $nascimento->format('Y-m-d');
+            $idade = $nascimento->age;
+            $validatedData['idade'] = $idade;
+        }
+
+        $request->user()->update($validatedData);
 
         return Redirect::route('profile.edit');
     }

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
 
-class FilterPageController extends Controller
+class UsersController extends Controller
 {
     public function index()
     {
@@ -23,12 +23,11 @@ class FilterPageController extends Controller
                 'bairro' => $user->bairro,
                 'cidade' => $user->cidade,
                 'zona_eleitoral' => $user->zona_eleitoral,
-                'a1' => $user->a1,
                 'user_id' => $user->user_id,
+                'a1' => $user->a1,
                 'created_at' => $user->created_at,
             ];
         });
-        return Inertia::render('Filter', ['usersAll' => $filteredUsers]);
+        return Inertia::render('Users', ['usersAll' => $filteredUsers]);
     }
 }
-

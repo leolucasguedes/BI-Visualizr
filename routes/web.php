@@ -7,9 +7,8 @@ use App\Http\Controllers\ContactPageController;
 use App\Http\Controllers\FilterPageController;
 use App\Http\Controllers\UserPageController;
 use App\Http\Controllers\RegionPageController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -22,6 +21,8 @@ Route::get('/ranking',  [RankingPageController::class, 'index'])->middleware(['a
 Route::get('/contato',  [ContactPageController::class, 'index'])->middleware(['auth', 'verified'])->name('contact');
 
 Route::get('/filtro',  [FilterPageController::class, 'index'])->middleware(['auth', 'verified'])->name('filter');
+
+Route::get('/usuarios',  [UsersController::class, 'index'])->middleware(['auth', 'verified'])->name('usuarios');
 
 Route::get('/usuario/{id}', [UserPageController::class, 'index'])->middleware(['auth', 'verified'])->name('usuario');
 

@@ -13,6 +13,14 @@ class RankingPageController extends Controller
     {
         $usersAll = User::all();
         $rank = $usersAll->map(function ($user) {
+            $indicatedUsers = User::where('user_id', $user->id)->get();
+
+            $sumIndicated = $indicatedUsers->sum(function ($indicatedUser) {
+                return User::where('user_id', $indicatedUser->id)->count();
+            });
+
+            $networkSum = $indicatedUsers->count() + $sumIndicated;
+
             return [
                 "id"=> $user->id,
                 'name' => $user->name,
@@ -23,7 +31,9 @@ class RankingPageController extends Controller
                 'sexo' => $user->sexo,
                 'bairro' => $user->bairro,
                 'cidade' => $user->cidade,
+                'zona_eleitoral' => $user->zona_eleitoral,
                 'user_id' => $user->user_id,
+                'rede' => $networkSum,
                 'created_at' => $user->created_at,
             ];
         });

@@ -1,14 +1,14 @@
-import { useState } from "react";
-import ReactPaginate from "react-paginate";
+import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { columns, conditionalRowStyles, customStyles } from "../api/tableData";
+import ReactPaginate from "react-paginate";
+import { columns, mobileColumns, conditionalRowStyles, customStyles } from "../api/tableData";
 import { LeadListIcon } from "../icon";
 import { RankUserData } from "../types";
 
+
 interface RankDataFull extends RankUserData {
-    id: number;
-    user_id: number;
     indications: number;
+    position: number;
 }
 
 interface Props {
@@ -21,26 +21,53 @@ function RankingComponent({ rank }: Props) {
     const pageSize = 10;
     const rankSort = generateLeaderboard(rank);
     const pageCount: number = Math.ceil(rankSort.length / itemsPerPage);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener("resize", handleResize);
+
+        handleResize();
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     function generateLeaderboard(rank: RankUserData[]): RankDataFull[] {
-        const leaderCounts: { [userId: number]: number } = {};
+        let indications: any = {};
 
-        rank.forEach((user) => {
-            leaderCounts[user.user_id] = (leaderCounts[user.user_id] || 0) + 1;
+        rank.forEach((rankUser: RankUserData) => {
+            if (rankUser.user_id !== null) {
+                if (rankUser.user_id in indications) {
+                    indications[rankUser.user_id]++;
+                } else {
+                    indications[rankUser.user_id] = 1;
+                }
+            }
         });
 
-        const leaderboard: [number, number][] = Object.entries(
-            leaderCounts
-        ).map(([userId, count]) => [parseInt(userId), count]);
+        let usersIndications: any[] = Object.keys(indications).map(
+            (user_id: string) => {
+                return {
+                    ...rank.find((user) => user.id === parseInt(user_id)),
+                    indications: indications[user_id],
+                    position: 0,
+                };
+            }
+        );
 
-        leaderboard.sort((a, b) => b[1] - a[1]);
+        usersIndications.sort(
+            (a: any, b: any) => b.indications - a.indications
+        );
 
-        const rankedUsersWithIndications: RankDataFull[] = leaderboard.map(([userId, _]) => {
-            const user = rank.find((user) => user.user_id === userId)!;
-            return { ...user, indications: leaderCounts[userId] };
+        usersIndications.forEach((usuario: any, index: number) => {
+            usuario.position = index + 1;
         });
 
-        return rankedUsersWithIndications;
+        return usersIndications;
     }
 
     const paginatedData = rankSort.slice(
@@ -53,19 +80,20 @@ function RankingComponent({ rank }: Props) {
     };
 
     return (
-        <div className="w-full overflow-x-auto text-center mt-8 bg-white pb-10 rounded-xl md:text-left relative">
+        <div className="w-full overflow-x-auto mt-8 bg-white pb-10 rounded-xl md:text-left relative">
             <div className="absolute top-8 left-6">
                 <LeadListIcon />
             </div>
-            <h1 className="text-18px font-bold font-montserrat mb-4 py-6 md:text-22px sm:ml-20">
+            <h1 className="text-18px font-bold font-montserrat mb-4 py-6 md:text-22px ml-20">
                 Maiores Embaixadores
             </h1>
             <DataTable
                 className="sm:px-10"
-                columns={columns}
+                columns={isMobile ? mobileColumns : columns}
                 data={paginatedData}
                 conditionalRowStyles={conditionalRowStyles}
                 customStyles={customStyles}
+                responsive
             />
             <ReactPaginate
                 previousLabel="<"

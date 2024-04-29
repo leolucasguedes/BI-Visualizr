@@ -19,7 +19,7 @@ const navigation = [
     { name: "Filtro", href: "/filtro", icon: MdOutlineTune, current: false },
     { name: "Rankings", href: "/ranking", icon: ImStatsBars, current: false },
     { name: "Contatos", href: "/contato", icon: MdOutlineContacts, current: false, },
-    { name: "Chat ao Vivo", href: "https://wa.me/21991992766", icon: PiChatsBold, current: false, },
+    { name: "Chat ao Vivo", href: "https://wa.me/21983364694", icon: PiChatsBold, current: false, },
 ];
 
 const userNavigation = [

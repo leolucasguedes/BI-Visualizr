@@ -15,7 +15,15 @@ interface Props {
 }
 
 export const CityChart: React.FC<Props> = ({ users }) => {
-    const cidades = [...new Set(users.map((user) => user.cidade))];
+    const capitalizeFirstLetter = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+    const city = [
+        ...new Set(users.map((user) => user.cidade?.toLowerCase().trim().slice(0, 25))),
+    ];
+    const cityValid = city
+        .filter((cidade) => typeof cidade === "string" && cidade !== "")
+        .map((cidade) => capitalizeFirstLetter(cidade));
 
     const contagemPorCidade: { [key: string]: number } = {};
     users.forEach((user) => {
@@ -24,11 +32,11 @@ export const CityChart: React.FC<Props> = ({ users }) => {
     });
 
     const chartData = {
-        labels: cidades,
+        labels: cityValid,
         datasets: [
             {
                 label: "Usuários",
-                data: cidades.map((cidade) => contagemPorCidade[cidade]),
+                data: cityValid.map((cidade) => contagemPorCidade[cidade]),
                 backgroundColor: [
                     "rgba(255, 99, 132, 0.5)",
                     "rgba(54, 162, 235, 0.5)",
@@ -125,7 +133,7 @@ export const CityLegend: React.FC<LegendProps> = ({
             <ul className="list-none">
                 {labels.map((label, index) => (
                     <li
-                        key={label}
+                        key={`${label}${index}`}
                         className="flex items-center ml-4 mr-1 mb-2 text-10px"
                     >
                         <span

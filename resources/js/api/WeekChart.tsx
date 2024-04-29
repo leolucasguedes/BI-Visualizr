@@ -98,11 +98,11 @@ export const WeeklyContactGraph: React.FC<Props> = ({ usersAll }) => {
     const getLastWeeksLabels = (numberOfWeeks: number): string[] => {
         const labels: string[] = [];
 
-        for (let i = numberOfWeeks - 1; i >= 0; i--) {
+        for (let i = numberOfWeeks - 1; i > 0; i--) {
             const endDate = new Date();
             const startDate = new Date(endDate);
-            startDate.setDate(startDate.getDate() - (i + 1) * 7);
-            endDate.setDate(endDate.getDate() - i * 7);
+            startDate.setDate(startDate.getDate() - (i * 7));
+            endDate.setDate(endDate.getDate() - ((i - 1) * 7) - 1);
             const label = `${format(startDate, "dd/MM/yyyy")} - ${format(
                 endDate,
                 "dd/MM/yyyy"

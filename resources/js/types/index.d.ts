@@ -2,7 +2,16 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    bairro: string;
+    cidade: string;
+    whatsapp: string;
+    idade: number;
+    nascimento: string;
+    sexo: string;
+    zona_eleitoral: string;
     email_verified_at: string;
+    created_at: string;
+    is_admin: number;
 }
 
 export interface UserData {

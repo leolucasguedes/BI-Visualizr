@@ -19,12 +19,15 @@ export default function Dashboard({ auth, usersAll }: Props) {
     }
 
     function countLeaders(usersAll: RankUserData[]): number {
-        const leaderIds: Set<number> = new Set();
+        let indicadores = new Set<number>();
 
-        usersAll.forEach((user) => {
-            leaderIds.add(user.user_id);
+        usersAll.forEach((usuario: any) => {
+            if (usuario.user_id !== null) {
+                indicadores.add(usuario.user_id);
+            }
         });
-        return leaderIds.size;
+
+        return indicadores.size;
     }
 
     function countUsersWithBairro(users: RankUserData[]): number {
@@ -69,7 +72,8 @@ export default function Dashboard({ auth, usersAll }: Props) {
             <Head title="Dashboard" />
             <div className="h-auto w-full sm:px-5 py-2">
                 <div className="h-auto w-full mt-3 flex flex-wrap gap-5">
-                    <div className="bg-custom-blue h-[94px] w-full max-w-[382.5px] shadow-sm rounded-md">
+                    <Link className="bg-custom-blue h-[94px] w-full max-w-[382.5px] shadow-sm rounded-md"
+                    href="/usuarios">
                         <div className="sm:p-5 text-16px text-white flex mx-10 font-bold relative font-montserrat pt-5">
                             <div className="text-white mr-7 mt-1">
                                 <RegisterIcon />
@@ -79,8 +83,11 @@ export default function Dashboard({ auth, usersAll }: Props) {
                                 {numberOfUsers}
                             </span>
                         </div>
-                    </div>
-                    <div className="bg-custom-green h-[94px] w-full shadow-sm rounded-md max-w-[382.5px]">
+                    </Link>
+                    <Link
+                        className="bg-custom-green h-[94px] w-full shadow-sm rounded-md max-w-[382.5px]"
+                        href="/ranking"
+                    >
                         <div className="sm:p-5 text-16px text-white flex mx-10 font-bold relative font-montserrat pt-5">
                             <div className="text-white mr-5 mt-1">
                                 <LeaderIcon />
@@ -90,7 +97,7 @@ export default function Dashboard({ auth, usersAll }: Props) {
                                 {leaders}
                             </span>
                         </div>
-                    </div>
+                    </Link>
                     <div className="bg-white h-[94px] w-full shadow-md rounded-md max-w-[765px]">
                         <div className="pt-6 sm:p-6 flex justify-between">
                             <div className="text-gray-500 mt-1 pl-7 flex">
