@@ -1,4 +1,4 @@
-import { useEffect, FormEventHandler } from "react";
+import { useState, useEffect, FormEventHandler } from "react";
 import Checkbox from "../../Components/Checkbox";
 import GuestLayout from "../../Layouts/GuestLayout";
 import InputError from "../../Components/InputError";
@@ -6,6 +6,7 @@ import InputLabel from "../../Components/InputLabel";
 import PrimaryButton from "../../Components/PrimaryButton";
 import TextInput from "../../Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { IoMdEyeOff, IoMdEye } from "react-icons/io";
 
 export default function Login({
     status,
@@ -20,6 +21,8 @@ export default function Login({
         remember: false,
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+
     useEffect(() => {
         return () => {
             reset("password");
@@ -30,6 +33,31 @@ export default function Login({
         e.preventDefault();
 
         post(route("login"));
+    };
+
+    const translateErrorMessage = (
+        message: string | string[] | undefined
+    ): string | undefined => {
+        if (Array.isArray(message)) {
+            return message
+                .map((msg) => {
+                    switch (msg) {
+                        case "These credentials do not match our records.":
+                            return "As credenciais estão incorretas ou não correspondem.";
+                        default:
+                            return msg;
+                    }
+                })
+                .join(", ");
+        } else if (typeof message === "string") {
+            switch (message) {
+                case "These credentials do not match our records.":
+                    return "As credenciais estão incorretas ou não correspondem.";
+                default:
+                    return message;
+            }
+        }
+        return message;
     };
 
     return (
@@ -44,11 +72,14 @@ export default function Login({
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel
+                        htmlFor="email"
+                        value="Email ou Número"
+                    />
 
                     <TextInput
                         id="email"
-                        type="email"
+                        type="text"
                         name="email"
                         value={data.email}
                         className="mt-1 block w-full"
@@ -57,23 +88,40 @@ export default function Login({
                         onChange={(e) => setData("email", e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError
+                        message={translateErrorMessage(errors.email)}
+                        className="mt-2"
+                    />
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-4 relative">
                     <InputLabel htmlFor="password" value="Senha" />
 
                     <TextInput
                         id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="off"
                         onChange={(e) => setData("password", e.target.value)}
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute top-8 right-0.5 flex items-center pr-3"
+                    >
+                        {showPassword ? (
+                            <IoMdEyeOff className="h-6 w-6 text-gray-800" />
+                        ) : (
+                            <IoMdEye className="h-6 w-6 text-gray-800" />
+                        )}
+                    </button>
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError
+                        message={translateErrorMessage(errors.password)}
+                        className="mt-2"
+                    />
                 </div>
 
                 <div className="block mt-6">
@@ -91,10 +139,19 @@ export default function Login({
                     </label>
                 </div>
 
-                <PrimaryButton className="-ms-2 sm:ms-7" disabled={processing}>
+                <PrimaryButton
+                    className="ms-4 sm:ms-14 w-72 flex justify-center mt-4"
+                    disabled={processing}
+                >
                     Login
                 </PrimaryButton>
-                <div className="flex items-center justify-end mt-4">
+                <div className="flex items-center justify-between mt-4">
+                    <Link
+                        href={route("register")}
+                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Fazer cadastro
+                    </Link>
                     {canResetPassword && (
                         <Link
                             href={route("password.request")}

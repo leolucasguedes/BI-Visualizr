@@ -1,45 +1,84 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
-import { FormEventHandler } from 'react';
-import { PageProps } from '@/types';
+import InputError from "../../../Components/InputError";
+import InputLabel from "../../../Components/InputLabel";
+import PrimaryButton from "../../../Components/PrimaryButton";
+import TextInput from "../../../Components/TextInput";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import { Transition } from "@headlessui/react";
+import { FormEventHandler } from "react";
+import { PageProps } from "../../../types";
 
-export default function UpdateProfileInformation({ mustVerifyEmail, status, className = '' }: { mustVerifyEmail: boolean, status?: string, className?: string }) {
+export default function UpdateProfileInformation({
+    mustVerifyEmail,
+    status,
+    className = "",
+}: {
+    mustVerifyEmail: boolean;
+    status?: string;
+    className?: string;
+}) {
     const user = usePage<PageProps>().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
-        name: user.name,
-        email: user.email,
-    });
+    const { data, setData, patch, errors, processing, recentlySuccessful } =
+        useForm({
+            name: user.name,
+            email: user.email,
+            bairro: user.bairro,
+            nascimento: user.nascimento,
+        });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        patch(route("profile.update"));
+    };
+
+    const translateErrorMessage = (
+        message: string | string[] | undefined
+    ): string | undefined => {
+        if (Array.isArray(message)) {
+            return message
+                .map((msg) => {
+                    switch (msg) {
+                        case "The nascimento field format is invalid.":
+                            return "Para atualizar o nascimento digite somente números na ordem DIA/MÊS/ANO";
+                        default:
+                            return msg;
+                    }
+                })
+                .join(", ");
+        } else if (typeof message === "string") {
+            switch (message) {
+                case "The nascimento field format is invalid.":
+                    return "Para atualizar o nascimento digite somente números na ordem DIA/MÊS/ANO";
+                default:
+                    return message;
+            }
+        }
+        return message;
     };
 
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                    Informações do perfil
+                </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                    Atualize as informações do perfil da sua conta e o endereço
+                    de e-mail
                 </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="Nome" />
 
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
                         value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData("name", e.target.value)}
                         required
                         isFocused
                         autoComplete="name"
@@ -56,38 +95,83 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         type="email"
                         className="mt-1 block w-full"
                         value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
                         required
                         autoComplete="username"
                     />
 
                     <InputError className="mt-2" message={errors.email} />
                 </div>
+                <div>
+                    <InputLabel htmlFor="bairro" value="Bairro" />
+
+                    <TextInput
+                        id="bairro"
+                        className="mt-1 block w-full"
+                        value={data.bairro}
+                        onChange={(e) => setData("bairro", e.target.value)}
+                        required
+                        autoComplete="address-level2"
+                    />
+
+                    <InputError className="mt-2" message={errors.bairro} />
+                </div>
+
+                <div>
+                    <InputLabel
+                        htmlFor="nascimento"
+                        value="Data de Nascimento (digite como DDMMAAAA)"
+                    />
+
+                    <TextInput
+                        id="nascimento"
+                        className="mt-1 block w-full pt-3"
+                        placeholder="__/__/____"
+                        value={data.nascimento}
+                        onChange={(e) => {
+                            const sanitizedValue = e.target.value.replace(
+                                /[^\d]/g,
+                                ""
+                            );
+                            setData("nascimento", sanitizedValue);
+                        }}
+                        required
+                        maxLength={8}
+                        autoComplete="bday"
+                    />
+
+                    <InputError
+                        className="mt-2"
+                        message={translateErrorMessage(errors.nascimento)}
+                    />
+                </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
                         <p className="text-sm mt-2 text-gray-800">
-                            Your email address is unverified.
+                            Seu endereço de e-mail não foi verificado.
                             <Link
-                                href={route('verification.send')}
+                                href={route("verification.send")}
                                 method="post"
                                 as="button"
                                 className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
-                                Click here to re-send the verification email.
+                                Clique aqui para reenviar o e-mail de
+                                verificação.
                             </Link>
                         </p>
 
-                        {status === 'verification-link-sent' && (
+                        {status === "verification-link-sent" && (
                             <div className="mt-2 font-medium text-sm text-green-600">
-                                A new verification link has been sent to your email address.
+                                Um novo link de verificação foi enviado para o
+                                seu endereço de e-mail.
                             </div>
                         )}
                     </div>
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>Salvar</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -96,10 +180,11 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
+                        <p className="text-sm text-gray-600">Salvo.</p>
                     </Transition>
                 </div>
             </form>
         </section>
     );
 }
+

@@ -10,7 +10,7 @@ import {
 } from "react-icons/md";
 import { ImStatsBars } from "react-icons/im";
 import { PiChatsBold } from "react-icons/pi";
-import { User } from "@/types";
+import { User } from "../types";
 import { FaBars, FaBell, FaCircleChevronDown } from "react-icons/fa6";
 import { IoSearchOutline, IoClose  } from "react-icons/io5";
 
@@ -286,7 +286,7 @@ export default function Nav({ user }: PropsWithChildren<{ user: User }>) {
                                                 Olá, {user.name}
                                             </span>
                                             <FaCircleChevronDown
-                                                className="ml-2 h-5 w-5 text-gray-400"
+                                                className="ml-2 h-4 w-4 text-gray-400"
                                                 aria-hidden="true"
                                             />
                                         </span>
